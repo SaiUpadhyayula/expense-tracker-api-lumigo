@@ -16,13 +16,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class ExpenseDto {
-    @NotBlank
-    @Pattern(regexp = "[A-Za-z0-9]+")
-    private String id;
-    @NotBlank
-    @Pattern(regexp = "[a-zA-Z]")
+    private Long id;
+    @NotBlank(message = "Expense Name is required")
     private String expenseName;
     private ExpenseCategory expenseCategory;
-    @Min(value = 0)
+    @Min(value = 0, message = "Expense Amount must be greater than 0")
     private BigDecimal expenseAmount;
 }

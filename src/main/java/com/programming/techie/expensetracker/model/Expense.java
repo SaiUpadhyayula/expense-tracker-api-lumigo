@@ -1,9 +1,7 @@
 package com.programming.techie.expensetracker.model;
 
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.math.BigDecimal;
 
@@ -12,14 +10,13 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document("expense")
+@Entity
+@Table(name = "expense")
 public class Expense {
     @Id
-    private String id;
-    @Field("name")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
     private String expenseName;
-    @Field("category")
     private ExpenseCategory expenseCategory;
-    @Field("amount")
     private BigDecimal expenseAmount;
 }

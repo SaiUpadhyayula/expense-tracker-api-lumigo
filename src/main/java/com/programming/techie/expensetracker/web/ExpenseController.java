@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +32,8 @@ public class ExpenseController {
             @ApiResponse(responseCode = "400", description = "Invalid/Bad Request",
                     content = @Content)})
     @PostMapping
-    public ResponseEntity<Void> addExpense(@RequestBody ExpenseDto expenseDto) {
-        String expenseId = expenseService.addExpense(expenseDto);
+    public ResponseEntity<Void> addExpense(@RequestBody @Valid ExpenseDto expenseDto) {
+        Long expenseId = expenseService.addExpense(expenseDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -53,7 +54,7 @@ public class ExpenseController {
                     content = @Content),
             @ApiResponse(responseCode = "404", description = "Expense Not Found",
                     content = @Content)})
-    public void updateExpense(@RequestBody ExpenseDto expense) {
+    public void updateExpense(@RequestBody @Valid ExpenseDto expense) {
         expenseService.updateExpense(expense);
     }
 
@@ -77,7 +78,7 @@ public class ExpenseController {
                             schema = @Schema(implementation = ExpenseDto.class))}),
             @ApiResponse(responseCode = "404", description = "Expense Not Found",
                     content = @Content)})
-    public ExpenseDto getExpense(@PathVariable String id) {
+    public ExpenseDto getExpense(@PathVariable Long id) {
         return expenseService.getExpense(id);
     }
 
@@ -90,8 +91,7 @@ public class ExpenseController {
                             schema = @Schema(implementation = ExpenseDto.class))}),
             @ApiResponse(responseCode = "404", description = "Expense Not Found",
                     content = @Content)})
-    public void deleteExpense(@PathVariable String id) {
+    public void deleteExpense(@PathVariable Long id) {
         expenseService.deleteExpense(id);
     }
-
 }
