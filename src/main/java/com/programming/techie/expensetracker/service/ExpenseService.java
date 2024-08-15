@@ -6,11 +6,8 @@ import com.programming.techie.expensetracker.model.Expense;
 import com.programming.techie.expensetracker.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -30,10 +27,10 @@ public class ExpenseService {
     public void updateExpense(ExpenseDto expenseDto) {
         Expense expense = mapFromDto(expenseDto);
         if(expenseDto.getId() == null) {
-            throw new IllegalArgumentException("Expense ID is required");
+            log.warn("Expense ID is required");
+            throw new IllegalArgumentException();
         }
-        Expense savedExpense = expenseRepository.findById(expenseDto.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                String.format("Cannot Find Expense by ID %s", expense.getId())));
+        var savedExpense = getExpenseById(expenseDto.getId());
         savedExpense.setExpenseName(expense.getExpenseName());
         savedExpense.setExpenseCategory(expense.getExpenseCategory());
         savedExpense.setExpenseAmount(expense.getExpenseAmount());
@@ -42,8 +39,7 @@ public class ExpenseService {
     }
 
     public ExpenseDto getExpense(Long id) {
-        Expense expense = expenseRepository.findById(id)
-                .orElseThrow(() -> new ExpenseNotFoundException(String.format("Cannot Find Expense by ID - %s", id)));
+        var expense = getExpenseById(id);
         return mapToDto(expense);
     }
 
@@ -54,7 +50,18 @@ public class ExpenseService {
     }
 
     public void deleteExpense(Long id) {
+        getExpenseById(id);
         expenseRepository.deleteById(id);
+        log.info("Expense with id '{}' deleted", id);
+    }
+
+
+    private Expense getExpenseById(Long id) {
+        return expenseRepository.findById(id)
+                .orElseThrow(() ->{
+                    log.warn("Expense with ID - {} not found", id);
+                    return new ExpenseNotFoundException(String.format("Cannot find expense by ID - %s", id));
+                });
     }
 
     private ExpenseDto mapToDto(Expense expense) {
